@@ -10,31 +10,36 @@ func (t TokenType) String() string {
 
 const (
 	EOF TokenType = iota
-
 	Int
 	Float
-
 	Bool
-
+	String
 	Ident
 	Keyword
-
 	LCurly
 	RCurly
-
+	LParen
+	RParen
 	Semi
+	Comma
+	Operator
 )
 
 var tokenNames = map[TokenType]string{
-	EOF:     "EOF",
-	Int:     "Int",
-	Float:   "Float",
-	Bool:    "Bool",
-	Ident:   "Ident",
-	Keyword: "Keyword",
-	LCurly:  "LCurly",
-	RCurly:  "RCurly",
-	Semi:    "Semi",
+	EOF:      "EOF",
+	Int:      "Int",
+	Float:    "Float",
+	Bool:     "Bool",
+	String:   "String",
+	Ident:    "Ident",
+	Keyword:  "Keyword",
+	LCurly:   "LCurly",
+	RCurly:   "RCurly",
+	LParen:   "LParen",
+	RParen:   "RParen",
+	Semi:     "Semi",
+	Comma:    "Comma",
+	Operator: "Operator",
 }
 
 type Token struct {

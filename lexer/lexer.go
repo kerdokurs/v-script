@@ -25,6 +25,19 @@ var singleChars = map[rune]TokenType{
 	'{': LCurly,
 	'}': RCurly,
 	';': Semi,
+	'(': LParen,
+	')': RParen,
+	',': Comma,
+}
+
+var operators = map[rune][]rune{
+	'-': {0, '>'},
+	'+': {0},
+	'>': {0, '='},
+	'<': {0, '='},
+	'=': {0},
+	'!': {'='},
+	'%': {0},
 }
 
 type Lexer struct {
@@ -75,6 +88,10 @@ func (l *Lexer) nextToken() (Token, error) {
 			return l.readIdentOrKeyword()
 		} else if t, ok := singleChars[r]; ok {
 			return l.readSingleChar(t)
+		} else if _, ok := operators[r]; ok {
+			return l.readOperator()
+		} else if r == '"' {
+			return l.readStringLiteral()
 		}
 
 		return Token{}, fmt.Errorf("invalid token: %s", string(r))
@@ -160,5 +177,63 @@ func (l *Lexer) readSingleChar(tokenType TokenType) (Token, error) {
 	return Token{
 		Type: tokenType,
 		Data: string(r),
+	}, nil
+}
+
+func (l *Lexer) readOperator() (Token, error) {
+	var sb strings.Builder
+
+	r, _, err := l.r.ReadRune()
+	if err != nil {
+		return Token{}, err
+	}
+
+	sb.WriteRune(r)
+
+	extended := operators[r]
+
+	if len(extended) > 1 {
+		if r, _, err = l.r.ReadRune(); err != nil {
+			return Token{}, err
+		}
+
+		if utils.Contains(extended, r) {
+			sb.WriteRune(r)
+		} else {
+			if err = l.r.UnreadRune(); err != nil {
+				return Token{}, err
+			}
+		}
+	}
+
+	return Token{
+		Type: Operator,
+		Data: sb.String(),
+	}, nil
+}
+
+func (l *Lexer) readStringLiteral() (Token, error) {
+	if _, _, err := l.r.ReadRune(); err != nil {
+		return Token{}, err
+	}
+
+	var sb strings.Builder
+
+	for {
+		r, _, err := l.r.ReadRune()
+		if err != nil {
+			return Token{}, err
+		}
+
+		if r == '"' {
+			break
+		}
+
+		sb.WriteRune(r)
+	}
+
+	return Token{
+		Type: String,
+		Data: sb.String(),
 	}, nil
 }

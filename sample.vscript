@@ -11,16 +11,19 @@ type Payload {
   Metadata metadata;
 }
 
-validate on Metadata (...) {
+validate on Metadata (version) {
   allow if count >= 0 or count <= 6 -> "Count must be between 0 and 6";
   allow if count == 0 or count % 2 == 0 -> "Count must be even";
-  allow if count > 0 and why is not empty -> "Why is required if count is greater than 0";
 }
 
-validate on Payload (...) {
+validate on Metadata (version) if count > 0 and version > 1 {
+  allow if why is not empty -> "Why is required";
+}
+
+validate on Payload (version) {
   allow if first_name is not empty -> "First name is required";
   allow if last_name is not empty -> "Last name is required";
   allow if class_name is not empty -> "Class name is required";
   allow if year > 0 and year <= 3 -> "Year must be between 1 and 3";
-  allow if validate metadata -> _;
+  allow if validate metadata;
 }
