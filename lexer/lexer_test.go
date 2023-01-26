@@ -137,6 +137,12 @@ func (s *ValidationsTestSuite) TestInvalid() {
 	tokens, err = lexer.Lex()
 	s.NotNil(err)
 	s.Nil(tokens)
+
+	input4 := `!true`
+	lexer = New(strings.NewReader(input4))
+	tokens, err = lexer.Lex()
+	s.NotNil(err)
+	s.Nil(tokens)
 }
 
 func TestLexer(t *testing.T) {
